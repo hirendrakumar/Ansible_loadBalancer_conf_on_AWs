@@ -1,0 +1,45 @@
+---
+# tasks file for mylb
+
+- name: installing the haproxy
+  package: 
+       name: "haproxy"
+       state: present
+
+- name: changing port no
+  replace: 
+      path: /etc/haproxy/haproxy.cfg
+      regexp: "5000"
+      replace: "8080"
+  notify: hello
+
+- name: handlers run fast
+  meta: flush_handlers
+
+- name: comment removing
+  replace:
+          path: /etc/haproxy/haproxy.cfg
+          regexp: '#backend app'
+          replace: 'backend app'
+
+- name: comment removing again
+  replace: 
+          path: /etc/haproxy/haproxy.cfg
+          regexp: "#    default_backend             app"            
+          replace: "    default_backend             app"            
+
+- name: managed nodes
+  blockinfile:
+          path: /etc/haproxy/haproxy.cfg
+          insertafter: '''backend app
+                              balance     roundrobin'''
+          block: |
+             {% for hosts in groups['tag_name_web'] %}
+                server app{{ loop.index }}  {{ hosts }}:80 check
+             {% endfor %}
+
+- name: service
+  service:
+          name: haproxy
+          state: started
+

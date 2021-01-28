@@ -1,0 +1,10 @@
+---
+# handlers file for mylb
+
+
+ 
+- name: hello
+  replace: 
+    path: /etc/haproxy/haproxy.cfg
+    regexp: '(.*app.*)'
+    replace: '#\1'
