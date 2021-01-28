@@ -1,0 +1,15 @@
+---
+# tasks file for httpdrole
+- name: installing the httpd software
+  package:
+      name: 
+         - httpd
+         - php   
+      state: present
+
+- name: copying pages
+  copy: 
+      src: /root/index.php
+      dest: /var/www/html/
+  notify: me
+
